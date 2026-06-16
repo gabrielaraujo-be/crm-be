@@ -280,6 +280,11 @@
             <nav class="flex items-center gap-1 border-t border-slate-100 dark:border-slate-800 py-1.5">
                 <button data-tab="pipeline" onclick="switchTab('pipeline')" class="tab-btn px-4 py-1.5 text-sm font-semibold rounded-lg transition-all">Pipeline</button>
                 <button data-tab="maodeobra" onclick="switchTab('maodeobra')" class="tab-btn px-4 py-1.5 text-sm font-semibold rounded-lg transition-all">Mão de Obra</button>
+                <button data-tab="historico" onclick="switchTab('historico')" class="tab-btn px-4 py-1.5 text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Histórico
+                    <span id="history-badge" class="hidden bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none">0</span>
+                </button>
             </nav>
         </div>
     </header>
@@ -453,7 +458,47 @@
         </div>
     </main>
 
-    <div id="opportunity-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- ── Histórico de Movimentações ── -->
+    <main id="view-historico" class="max-w-7xl mx-auto p-4 md:p-6 flex-grow flex-col gap-4 w-full hidden">
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white">Histórico de Movimentações</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Registro de quem moveu cada oportunidade e quando</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input id="history-search" oninput="renderHistory()" type="text" placeholder="Filtrar por usuário ou cliente..." class="text-xs px-3 py-2 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64">
+                <button onclick="clearHistory()" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 border border-rose-200 dark:border-rose-700 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 rounded-lg hover:border-rose-400 transition-all whitespace-nowrap">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Limpar histórico
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total de Moves</p>
+                <p id="hist-stat-total" class="text-2xl font-black text-slate-800 dark:text-white mt-1">0</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Usuários Ativos</p>
+                <p id="hist-stat-users" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">0</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Hoje</p>
+                <p id="hist-stat-today" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">0</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Última Atividade</p>
+                <p id="hist-stat-last" class="text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">—</p>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div id="history-timeline" class="flex flex-col gap-2"></div>
+        <p id="history-empty" class="hidden text-center py-16 text-slate-400 text-sm">Nenhuma movimentação registrada ainda.<br>Mova um card no Pipeline para começar o rastreamento.</p>
+    </main> class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full shadow-2xl relative overflow-hidden flex flex-col" style="animation: fadeIn .2s ease-out">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <h3 id="modal-title" class="font-bold text-lg text-slate-800 dark:text-white">Nova Oportunidade</h3>
@@ -530,6 +575,22 @@
                 <input type="date" id="task-date" class="px-3 py-2 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
                 <button onclick="addTask()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow transition-all shrink-0">Adicionar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===================== CARD HISTORY MODAL ===================== -->
+    <div id="card-history-modal" class="hidden fixed inset-0 z-[92] flex items-end sm:items-center justify-center" style="background:rgba(0,0,0,.5)">
+        <div class="bg-white dark:bg-slate-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden" style="animation:fadeIn .2s ease-out; max-height:80vh">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white text-base" id="card-hist-title">Histórico do Card</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400" id="card-hist-sub"></p>
+                </div>
+                <button onclick="closeCardHistory()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="card-hist-body" class="overflow-y-auto p-4 flex flex-col gap-2" style="max-height:55vh"></div>
         </div>
     </div>
 
@@ -734,13 +795,16 @@
             document.getElementById('view-pipeline').classList.toggle('hidden', tab !== 'pipeline');
             document.getElementById('view-maodeobra').classList.toggle('hidden', tab !== 'maodeobra');
             document.getElementById('view-maodeobra').classList.toggle('flex', tab === 'maodeobra');
+            document.getElementById('view-historico').classList.toggle('hidden', tab !== 'historico');
+            document.getElementById('view-historico').classList.toggle('flex', tab === 'historico');
             document.getElementById('new-op-btn').classList.toggle('hidden', tab !== 'pipeline');
             document.querySelectorAll('.tab-btn').forEach(b => {
                 const active = b.dataset.tab === tab;
-                b.className = 'tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all ' +
+                b.className = 'tab-btn px-4 py-1.5 text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 ' +
                     (active ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800');
             });
             if (tab === 'maodeobra') renderLabor();
+            if (tab === 'historico') renderHistory();
         }
 
         /* ===================== EXPORTAR / IMPORTAR DATA ===================== */
@@ -811,14 +875,161 @@
             });
         }
 
+        /* ===================== MOVE LOG ===================== */
+        let moveLog = JSON.parse(localStorage.getItem('kanban_moves') || '[]');
+
+        function persistLog() { localStorage.setItem('kanban_moves', JSON.stringify(moveLog)); }
+
+        function logMove(op, fromId, toId) {
+            if (fromId === toId) return;
+            const user = sessionStorage.getItem('crm_nome') || 'Desconhecido';
+            const entry = {
+                id: Date.now(),
+                opId: op.id,
+                cliente: op.cliente,
+                projeto: op.projeto,
+                fromId, toId,
+                user,
+                ts: new Date().toISOString()
+            };
+            moveLog.unshift(entry); // newest first
+            if (moveLog.length > 500) moveLog = moveLog.slice(0, 500); // cap at 500
+            persistLog();
+            updateHistoryBadge();
+        }
+
+        function updateHistoryBadge() {
+            const badge = document.getElementById('history-badge');
+            if (!badge) return;
+            const today = new Date().toDateString();
+            const todayCount = moveLog.filter(e => new Date(e.ts).toDateString() === today).length;
+            badge.textContent = todayCount;
+            badge.classList.toggle('hidden', todayCount === 0);
+        }
+
+        function fmtTs(iso) {
+            const d = new Date(iso);
+            const today = new Date();
+            const isToday = d.toDateString() === today.toDateString();
+            const time = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+            if (isToday) return `Hoje às ${time}`;
+            const diff = Math.floor((today - d) / 86400000);
+            if (diff === 1) return `Ontem às ${time}`;
+            return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' às ' + time;
+        }
+
+        function renderHistory() {
+            const q = (document.getElementById('history-search')?.value || '').toLowerCase();
+            const filtered = moveLog.filter(e =>
+                !q || e.user.toLowerCase().includes(q) || e.cliente.toLowerCase().includes(q) || e.projeto.toLowerCase().includes(q)
+            );
+
+            // Stats
+            const today = new Date().toDateString();
+            const users = new Set(moveLog.map(e=>e.user)).size;
+            const todayCount = moveLog.filter(e=>new Date(e.ts).toDateString()===today).length;
+            document.getElementById('hist-stat-total').textContent = moveLog.length;
+            document.getElementById('hist-stat-users').textContent = users;
+            document.getElementById('hist-stat-today').textContent = todayCount;
+            document.getElementById('hist-stat-last').textContent = moveLog.length ? fmtTs(moveLog[0].ts) : '—';
+
+            const timeline = document.getElementById('history-timeline');
+            const empty = document.getElementById('history-empty');
+
+            if (!filtered.length) {
+                timeline.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            timeline.innerHTML = filtered.map(e => {
+                const fromF = FASES[e.fromId]; const toF = FASES[e.toId];
+                const fromCol = PHASE_COLORS[e.fromId] || '#94a3b8';
+                const toCol   = PHASE_COLORS[e.toId]   || '#6366f1';
+                const [avatarBg] = clientColor(e.user);
+                const initials = e.user.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+                return `
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-start gap-3 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0" style="background:${avatarBg}">${initials}</div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                            <span class="font-bold text-slate-800 dark:text-white text-sm">${esc(e.user)}</span>
+                            <span class="text-xs text-slate-500">moveu</span>
+                            <span class="font-semibold text-slate-700 dark:text-slate-200 text-xs truncate max-w-[160px]">${esc(e.cliente)} — ${esc(e.projeto)}</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" style="background:${fromCol}18;color:${fromCol}">${fromF?.nome||'?'}</span>
+                            <svg class="h-3 w-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" style="background:${toCol}18;color:${toCol}">${toF?.nome||'?'}</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 whitespace-nowrap shrink-0 mt-0.5">${fmtTs(e.ts)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function clearHistory() {
+            if (!confirm('Limpar todo o histórico de movimentações?')) return;
+            moveLog = [];
+            persistLog();
+            updateHistoryBadge();
+            renderHistory();
+        }
+
+        function openCardHistory(opId) {
+            const op = oportunidades.find(o=>o.id===opId);
+            if (!op) return;
+            const entries = moveLog.filter(e=>e.opId===opId);
+            document.getElementById('card-hist-title').textContent = op.cliente;
+            document.getElementById('card-hist-sub').textContent = op.projeto;
+            const body = document.getElementById('card-hist-body');
+            if (!entries.length) {
+                body.innerHTML = `<div class="py-8 text-center text-slate-400 text-sm">Nenhuma movimentação registrada para este card.</div>`;
+            } else {
+                body.innerHTML = entries.map(e => {
+                    const fromF = FASES[e.fromId]; const toF = FASES[e.toId];
+                    const fromCol = PHASE_COLORS[e.fromId]||'#94a3b8';
+                    const toCol   = PHASE_COLORS[e.toId]||'#6366f1';
+                    const [avatarBg] = clientColor(e.user);
+                    const initials = e.user.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+                    return `
+                    <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0" style="background:${avatarBg}">${initials}</div>
+                        <div class="flex-grow min-w-0">
+                            <p class="font-bold text-sm text-slate-800 dark:text-white">${esc(e.user)}</p>
+                            <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" style="background:${fromCol}18;color:${fromCol}">${fromF?.nome||'?'}</span>
+                                <svg class="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" style="background:${toCol}18;color:${toCol}">${toF?.nome||'?'}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1">${fmtTs(e.ts)}</p>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            document.getElementById('card-history-modal').classList.remove('hidden');
+        }
+
+        function closeCardHistory() {
+            document.getElementById('card-history-modal').classList.add('hidden');
+        }
+        document.getElementById('card-history-modal').addEventListener('click', function(e){ if(e.target===this) closeCardHistory(); });
+
         function onDrop(evt) {
             const movedId = parseInt(evt.item.dataset.id);
-            const toCol = parseInt(evt.to.dataset.statusId);
+            const fromCol = parseInt(evt.from.dataset.statusId);
+            const toCol   = parseInt(evt.to.dataset.statusId);
             const op = oportunidades.find(o => o.id === movedId);
             if (!op) return;
+
+            const prevStatusId = op.statusId;
             op.statusId = toCol;
             if (toCol !== 7) delete op.motivo;
-            
+
+            // Log the move
+            logMove(op, fromCol !== toCol ? fromCol : prevStatusId, toCol);
+
             let prevEl = evt.item.previousElementSibling;
             while (prevEl && !prevEl.dataset.id) prevEl = prevEl.previousElementSibling;
             oportunidades = oportunidades.filter(o => o.id !== movedId);
@@ -879,6 +1090,9 @@
                                     ${op.motivo?`<p class="text-[11px] text-rose-500 mt-0.5">⚑ ${esc(op.motivo)}</p>`:''}
                                 </div>
                                 <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5 ml-1 shrink-0">
+                                    <button onclick="openCardHistory(${op.id})" class="no-drag p-1 text-slate-400 hover:text-indigo-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700" title="Histórico">
+                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </button>
                                     <button onclick="editOpportunity(${op.id})" class="no-drag p-1 text-slate-400 hover:text-indigo-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700" title="Editar">
                                         <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
                                     </button>
@@ -1445,7 +1659,8 @@
         buildBoard();
         renderKanban();
         switchTab('pipeline');
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); closeTasks(); } });
+        updateHistoryBadge();
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); closeTasks(); closeCardHistory(); } });
 
         /* ===================== ASSISTENTE IA ===================== */
         let chatHistory = [];
