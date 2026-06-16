@@ -1757,7 +1757,15 @@
 
         /* ===================== DASHBOARD ===================== */
         const DASH_COLORS = ['#0EA5E9','#8B5CF6','#F59E0B','#EF4444','#10B981','#06B6D4','#EC4899','#6366F1'];
-        const PHASE_COLORS = { 1:'#0EA5E9', 2:'#06B6D4', 3:'#8B5CF6', 4:'#F59E0B', 5:'#10B981', 6:'#EF4444' };
+        const PHASE_COLORS = {
+            1: '#3B82F6',  // blue-500    → Prospecção
+            2: '#8B5CF6',  // violet-500  → Qualificação
+            3: '#F59E0B',  // amber-500   → Proposta
+            4: '#EC4899',  // pink-500    → Negociação
+            5: '#10B981',  // emerald-500 → Faturados
+            6: '#A855F7',  // purple-500  → Recebidos
+            7: '#EF4444',  // rose-500    → Perdido
+        };
         let dashCharts = {};
 
         function openDashboard(type) {
