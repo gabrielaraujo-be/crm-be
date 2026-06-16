@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' };</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,6 +21,30 @@
         .sortable-ghost { opacity: .4; border: 2px dashed #6366f1 !important; }
         .sortable-chosen { cursor: grabbing; }
         .sortable-drag { transform: rotate(1.5deg); }
+        /* ===== VIBRANT CARDS ===== */
+        .stat-card { cursor: pointer; transition: transform .18s, box-shadow .18s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px -4px var(--card-shadow, rgba(99,102,241,.35)); }
+        .stat-card:active { transform: translateY(-1px); }
+        @keyframes cardPop { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:none} }
+        .stat-card { animation: cardPop .3s ease-out both; }
+        .stat-card:nth-child(2){animation-delay:.06s} .stat-card:nth-child(3){animation-delay:.12s} .stat-card:nth-child(4){animation-delay:.18s}
+        /* ===== DASHBOARD MODAL ===== */
+        @keyframes dashSlideUp { from{opacity:0;transform:translateY(40px) scale(.97)} to{opacity:1;transform:none} }
+        .dash-panel { animation: dashSlideUp .28s cubic-bezier(.22,1,.36,1); }
+        #dash-modal { backdrop-filter: blur(6px); }
+        .dash-tab-btn.active { background: white; color: #4F46E5; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+        .dash-tab-btn { transition: all .15s; }
+        /* ===== MOBILE HEADER ===== */
+        @media (max-width: 767px) {
+            .hdr-actions-full { display: none !important; }
+            .hdr-mobile-actions { display: flex !important; }
+            .hdr-title { display: none !important; }
+        }
+        @media (min-width: 768px) {
+            .hdr-mobile-actions { display: none !important; }
+        }
+        /* ===== COMPANY AVATAR ===== */
+        .company-avatar { width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; letter-spacing:-.3px; }
         /* ===== LOGIN ===== */
         @keyframes loginFadeIn { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
         @keyframes loginBgPulse { 0%,100% { opacity: .45; } 50% { opacity: .65; } }
@@ -138,117 +163,192 @@
     <!-- ===================== APP (hidden until login) ===================== -->
     <div id="app-container" class="hidden flex-col min-h-screen">
 
-    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 px-6 py-4 shadow-sm">
-        <div class="max-w-7xl mx-auto flex flex-col gap-4">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <!-- Be Solution Logo -->
-                    <img src="https://besolution.com.br/images/logo-be-new-site-footer-lb.png"
-                         alt="Be Solution"
-                         class="h-8 w-auto object-contain hidden dark:block"
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+
+            <!-- ── Desktop header ── -->
+            <div class="hidden md:flex items-center gap-3 py-2.5 min-w-0">
+
+                <!-- Logo (shrink-0 to never collapse) -->
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <img src="https://besolution.com.br/images/logo-be-new-site-footer-lb.png" alt="Be Solution"
+                         class="h-7 w-auto object-contain hidden dark:block" onerror="this.style.display='none'">
+                    <img src="https://besolution.com.br/images/logo-be-new-site-footer-lb.png" alt="Be Solution"
+                         class="h-7 w-auto object-contain block dark:hidden"
+                         style="filter:brightness(0) saturate(100%) invert(23%) sepia(94%) saturate(1748%) hue-rotate(225deg) brightness(88%) contrast(102%);"
                          onerror="this.style.display='none'">
-                    <img src="https://besolution.com.br/images/logo-be-new-site-footer-lb.png"
-                         alt="Be Solution"
-                         class="h-8 w-auto object-contain block dark:hidden"
-                         style="filter: brightness(0) saturate(100%) invert(23%) sepia(94%) saturate(1748%) hue-rotate(225deg) brightness(88%) contrast(102%);"
-                         onerror="this.style.display='none'">
-                    <div class="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                    <div class="p-2 bg-indigo-600 text-white rounded-lg shadow-sm shadow-indigo-200/50 dark:shadow-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                        </svg>
+                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
+                    <div class="p-1.5 bg-indigo-600 text-white rounded-lg shrink-0">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">CRM Kanban de Oportunidades</h1>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Gestão Comercial &amp; Visualização de Pipeline</p>
+                    <div class="leading-tight">
+                        <h1 class="text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">CRM Kanban de Oportunidades</h1>
+                        <p class="text-[10px] text-slate-400 whitespace-nowrap">Gestão Comercial & Pipeline</p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="toggleTheme()" id="theme-btn" title="Alternar tema claro/escuro" class="inline-flex items-center justify-center w-10 h-10 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg transition-all hover:border-slate-400">
-                        <svg class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        <svg class="h-5 w-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <!-- Spacer -->
+                <div class="flex-grow"></div>
+
+                <!-- Actions — all shrink-0, never wrap -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-lg hover:border-slate-400 transition-all shrink-0">
+                        <svg class="h-3.5 w-3.5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <svg class="h-3.5 w-3.5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     </button>
-                    
-                    <button onclick="exportarDados()" title="Exportar dados atuais para um arquivo" class="inline-flex items-center gap-2 border border-emerald-300 dark:border-emerald-700 hover:border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-3 py-2.5 rounded-lg transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        Exportar Dados
+
+                    <button onclick="exportarDados()" class="shrink-0 flex items-center gap-1 border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all hover:border-emerald-400 whitespace-nowrap">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Exportar
                     </button>
-                    <button onclick="document.getElementById('import-file').click()" title="Importar arquivo de dados recebido" class="inline-flex items-center gap-2 border border-blue-300 dark:border-blue-700 hover:border-blue-400 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 text-sm font-semibold px-3 py-2.5 rounded-lg transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+
+                    <button onclick="document.getElementById('import-file').click()" class="shrink-0 flex items-center gap-1 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all hover:border-blue-400 whitespace-nowrap">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                         Importar
                     </button>
                     <input type="file" id="import-file" class="hidden" accept=".json" onchange="importarDados(this)">
 
-                    <button onclick="openModal()" id="new-op-btn" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-all shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    <button onclick="openModal()" class="shrink-0 flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all shadow-sm whitespace-nowrap">
+                        <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
                         Nova Oportunidade
                     </button>
-                    <button onclick="resetData()" class="inline-flex items-center gap-2 border border-slate-300 dark:border-slate-700 hover:border-slate-400 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold px-4 py-2.5 rounded-lg transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.213 6h-3.07" /></svg>
+
+                    <button onclick="resetData()" class="shrink-0 flex items-center gap-1 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all hover:border-slate-400 whitespace-nowrap">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.213 6h-3.07"/></svg>
                         Resetar
                     </button>
-                    <div class="w-px h-7 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                    <div class="flex items-center gap-2 pl-1">
-                        <div class="flex flex-col items-end leading-none">
-                            <span id="header-username" class="text-xs font-semibold text-slate-700 dark:text-slate-200"></span>
-                            <span class="text-[10px] text-slate-400">logado</span>
+
+                    <div class="w-px h-5 bg-slate-200 dark:bg-slate-700 shrink-0"></div>
+
+                    <!-- User -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0" id="hdr-avatar-desktop">G</div>
+                        <div class="leading-none">
+                            <p id="header-username" class="text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap"></p>
+                            <p class="text-[10px] text-slate-400">logado</p>
                         </div>
-                        <button onclick="handleLogout()" title="Sair" class="inline-flex items-center justify-center w-9 h-9 border border-slate-300 dark:border-slate-700 hover:border-rose-400 hover:text-rose-600 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg transition-all">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <button onclick="handleLogout()" title="Sair" class="shrink-0 w-7 h-7 flex items-center justify-center border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-500 bg-white dark:bg-slate-800 text-slate-400 rounded-lg transition-all">
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <nav class="flex items-center gap-1 border-t border-slate-100 dark:border-slate-800 pt-3 -mb-1">
-                <button data-tab="pipeline" onclick="switchTab('pipeline')" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all">Pipeline</button>
-                <button data-tab="maodeobra" onclick="switchTab('maodeobra')" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all">Mão de Obra</button>
+            <!-- ── Mobile header ── -->
+            <div class="flex md:hidden items-center justify-between py-3 gap-2">
+                <img src="https://besolution.com.br/images/logo-be-new-site-footer-lb.png" alt="Be Solution"
+                     class="h-7 w-auto object-contain dark:block hidden" onerror="this.style.display='none'">
+                <img src="https://besolution.com.br/images/logo-be-new-site-footer-lb.png" alt="Be Solution"
+                     class="h-7 w-auto object-contain block dark:hidden"
+                     style="filter:brightness(0) saturate(100%) invert(23%) sepia(94%) saturate(1748%) hue-rotate(225deg) brightness(88%) contrast(102%);"
+                     onerror="this.style.display='none'">
+                <span class="flex-grow text-sm font-bold text-slate-800 dark:text-white ml-2">CRM Kanban</span>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openModal()" class="w-8 h-8 flex items-center justify-center bg-indigo-600 text-white rounded-lg shadow-sm">
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 rounded-lg">
+                        <svg class="h-4 w-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <svg class="h-4 w-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px] font-bold" id="hdr-avatar-mobile">G</div>
+                        <button onclick="handleLogout()" class="w-8 h-8 flex items-center justify-center border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-600 bg-white dark:bg-slate-800 text-slate-400 rounded-lg transition-all">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile action pills -->
+            <div class="flex md:hidden items-center gap-2 pb-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
+                <button onclick="exportarDados()" class="flex-shrink-0 flex items-center gap-1 border border-emerald-300 bg-emerald-50 text-emerald-700 text-[11px] font-semibold px-2.5 py-1.5 rounded-full">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Exportar
+                </button>
+                <button onclick="document.getElementById('import-file-mob').click()" class="flex-shrink-0 flex items-center gap-1 border border-blue-300 bg-blue-50 text-blue-700 text-[11px] font-semibold px-2.5 py-1.5 rounded-full">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Importar
+                </button>
+                <input type="file" id="import-file-mob" class="hidden" accept=".json" onchange="importarDados(this)">
+                <button onclick="resetData()" class="flex-shrink-0 flex items-center gap-1 border border-slate-300 bg-white text-slate-600 text-[11px] font-semibold px-2.5 py-1.5 rounded-full">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.213 6h-3.07"/></svg>
+                    Resetar
+                </button>
+            </div>
+
+            <!-- Tab nav (both) -->
+            <nav class="flex items-center gap-1 border-t border-slate-100 dark:border-slate-800 py-1.5">
+                <button data-tab="pipeline" onclick="switchTab('pipeline')" class="tab-btn px-4 py-1.5 text-sm font-semibold rounded-lg transition-all">Pipeline</button>
+                <button data-tab="maodeobra" onclick="switchTab('maodeobra')" class="tab-btn px-4 py-1.5 text-sm font-semibold rounded-lg transition-all">Mão de Obra</button>
             </nav>
         </div>
     </header>
 
     <main id="view-pipeline" class="max-w-7xl mx-auto p-4 md:p-6 flex-grow flex flex-col gap-6 w-full">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                <div>
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pipeline Ativo</span>
-                    <h3 id="total-pipeline" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">—</h3>
-                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-1">Fases 1 a 4 (em aberto)</p>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <!-- Pipeline Ativo -->
+            <div onclick="openDashboard('pipeline')" class="stat-card relative overflow-hidden rounded-2xl p-5 text-white flex flex-col justify-between min-h-[120px]"
+                 style="background:linear-gradient(135deg,#0EA5E9 0%,#4F46E5 100%); --card-shadow:rgba(14,165,233,.4);">
+                <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
+                <div class="absolute -right-2 -bottom-6 w-20 h-20 rounded-full bg-white/8"></div>
+                <div class="flex items-start justify-between gap-2 relative z-10">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-white/80">Pipeline Ativo</span>
+                    <div class="p-1.5 bg-white/20 rounded-lg shrink-0">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                 </div>
-                <div class="p-3 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                <div>
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Forecast Ponderado</span>
-                    <h3 id="total-weighted" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">—</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Valor × prob. da fase</p>
-                </div>
-                <div class="p-3 bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13h2l3 8 4-16 3 8h6" /></svg>
+                <div class="relative z-10 mt-2">
+                    <h3 id="total-pipeline" class="text-xl md:text-2xl font-black leading-tight">—</h3>
+                    <p class="text-[11px] text-white/70 mt-1 font-medium">Fases 1–4 • Ver dashboard →</p>
                 </div>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                <div>
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Faturamento Ganho</span>
-                    <h3 id="total-won" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">—</h3>
-                    <p id="win-rate" class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Win rate: —</p>
+            <!-- Forecast -->
+            <div onclick="openDashboard('forecast')" class="stat-card relative overflow-hidden rounded-2xl p-5 text-white flex flex-col justify-between min-h-[120px]"
+                 style="background:linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%); --card-shadow:rgba(139,92,246,.4);">
+                <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
+                <div class="absolute -right-2 -bottom-6 w-20 h-20 rounded-full bg-white/8"></div>
+                <div class="flex items-start justify-between gap-2 relative z-10">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-white/80">Forecast Ponderado</span>
+                    <div class="p-1.5 bg-white/20 rounded-lg shrink-0">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13h2l3 8 4-16 3 8h6"/></svg>
+                    </div>
                 </div>
-                <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div class="relative z-10 mt-2">
+                    <h3 id="total-weighted" class="text-xl md:text-2xl font-black leading-tight">—</h3>
+                    <p class="text-[11px] text-white/70 mt-1 font-medium">Valor × prob. → Ver gráfico</p>
                 </div>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                <div>
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quantidade</span>
-                    <h3 id="total-count" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
-                    <p id="average-value" class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Ticket médio: —</p>
+            <!-- Faturamento Ganho -->
+            <div onclick="openDashboard('ganho')" class="stat-card relative overflow-hidden rounded-2xl p-5 text-white flex flex-col justify-between min-h-[120px]"
+                 style="background:linear-gradient(135deg,#10B981 0%,#0EA5E9 100%); --card-shadow:rgba(16,185,129,.4);">
+                <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
+                <div class="absolute -right-2 -bottom-6 w-20 h-20 rounded-full bg-white/8"></div>
+                <div class="flex items-start justify-between gap-2 relative z-10">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-white/80">Faturamento Ganho</span>
+                    <div class="p-1.5 bg-white/20 rounded-lg shrink-0">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                 </div>
-                <div class="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                <div class="relative z-10 mt-2">
+                    <h3 id="total-won" class="text-xl md:text-2xl font-black leading-tight">—</h3>
+                    <p id="win-rate" class="text-[11px] text-white/70 mt-1 font-medium">Win rate: —</p>
+                </div>
+            </div>
+            <!-- Quantidade -->
+            <div onclick="openDashboard('clientes')" class="stat-card relative overflow-hidden rounded-2xl p-5 text-white flex flex-col justify-between min-h-[120px]"
+                 style="background:linear-gradient(135deg,#F59E0B 0%,#EF4444 100%); --card-shadow:rgba(245,158,11,.4);">
+                <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
+                <div class="absolute -right-2 -bottom-6 w-20 h-20 rounded-full bg-white/8"></div>
+                <div class="flex items-start justify-between gap-2 relative z-10">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-white/80">Oportunidades</span>
+                    <div class="p-1.5 bg-white/20 rounded-lg shrink-0">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-2">
+                    <h3 id="total-count" class="text-xl md:text-2xl font-black leading-tight">0</h3>
+                    <p id="average-value" class="text-[11px] text-white/70 mt-1 font-medium">Ticket médio: —</p>
                 </div>
             </div>
         </div>
@@ -433,7 +533,77 @@
         </div>
     </div>
 
-    <!-- ===================== BOT CHAT ===================== -->
+    <!-- ===================== DASHBOARD MODAL ===================== -->
+    <div id="dash-modal" class="fixed inset-0 z-[95] hidden items-center justify-center" style="background:rgba(0,0,0,.55);">
+        <div class="dash-panel relative w-full h-full md:h-auto md:max-h-[92vh] md:w-[90vw] md:max-w-5xl md:rounded-2xl bg-white dark:bg-slate-900 flex flex-col overflow-hidden shadow-2xl">
+
+            <!-- Modal Header (gradient) -->
+            <div id="dash-header" class="flex items-center justify-between px-5 py-4 text-white shrink-0" style="background:linear-gradient(135deg,#0EA5E9 0%,#4F46E5 100%)">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-widest text-white/70" id="dash-subtitle">Pipeline Ativo</p>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tight" id="dash-hero-value">—</h2>
+                    <p class="text-[12px] text-white/70 mt-0.5" id="dash-hero-sub">—</p>
+                </div>
+                <button onclick="closeDashboard()" class="w-9 h-9 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-xl transition-colors">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="flex items-center gap-1 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 shrink-0 overflow-x-auto">
+                <button onclick="switchDashTab('fases')" data-dtab="fases" class="dash-tab-btn active text-xs font-bold px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300">Por Fase</button>
+                <button onclick="switchDashTab('clientes')" data-dtab="clientes" class="dash-tab-btn text-xs font-bold px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300">Por Cliente</button>
+                <button onclick="switchDashTab('lista')" data-dtab="lista" class="dash-tab-btn text-xs font-bold px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300">Lista Completa</button>
+            </div>
+
+            <!-- Body (scrollable) -->
+            <div class="flex-grow overflow-y-auto p-4 md:p-6">
+
+                <!-- ── Tab: Por Fase ── -->
+                <div id="dtab-fases" class="flex flex-col gap-5">
+                    <!-- Mini phase cards -->
+                    <div id="dash-phase-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4">
+                            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">Valor por Fase</p>
+                            <div class="relative h-52"><canvas id="dash-chart-bar"></canvas></div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4">
+                            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">Distribuição por Fase</p>
+                            <div class="relative h-52"><canvas id="dash-chart-donut"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Tab: Por Cliente ── -->
+                <div id="dtab-clientes" class="hidden flex flex-col gap-4">
+                    <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4">
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">Top Clientes por Valor</p>
+                        <div class="relative h-64"><canvas id="dash-chart-clients"></canvas></div>
+                    </div>
+                    <div id="dash-client-list" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- ── Tab: Lista Completa ── -->
+                <div id="dtab-lista" class="hidden">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wide">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-bold">Cliente</th>
+                                    <th class="px-4 py-3 text-left font-bold">Projeto</th>
+                                    <th class="px-4 py-3 text-right font-bold">Valor</th>
+                                    <th class="px-4 py-3 text-center font-bold">Fase</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-table-body" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="chat-panel" class="hidden fixed bottom-24 right-5 z-[80] w-[360px] max-w-[calc(100vw-2rem)] flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden" style="max-height: min(560px, calc(100dvh - 130px));">
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-3 bg-indigo-600 text-white shrink-0">
@@ -698,24 +868,30 @@
                     ? `${ts.done}/${ts.total} tarefa${ts.total>1?'s':''}${ts.overdue ? ' · '+ts.overdue+' atrasada'+(ts.overdue>1?'s':'') : ts.next ? ' · '+fmtDate(ts.next) : ''}`
                     : '+ Adicionar tarefa';
                 card.innerHTML = `
-                    <div class="flex items-start justify-between gap-1">
-                        <div class="min-w-0">
-                            <span class="inline-block px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded text-[10px] font-bold tracking-wide uppercase">${esc(op.cliente)}</span>${op.comissao > 0 ? `<span class="inline-block ml-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300 rounded text-[10px] font-bold uppercase">com ${op.comissao}%</span>` : ''}
-                            <h5 class="font-bold text-slate-800 dark:text-slate-100 text-sm mt-1 leading-snug">${esc(op.projeto)}</h5>
-                            ${op.motivo ? `<p class="text-[11px] text-rose-500 mt-0.5">⚑ ${esc(op.motivo)}</p>` : ''}
-                        </div>
-                        <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5 ml-2 shrink-0">
-                            <button onclick="editOpportunity(${op.id})" class="no-drag p-1 text-slate-400 hover:text-indigo-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700" title="Editar">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
-                            </button>
-                            <button onclick="deleteOpportunity(${op.id})" class="no-drag p-1 text-slate-400 hover:text-rose-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700" title="Excluir">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                            </button>
+                    <div class="flex items-start gap-2.5">
+                        ${clientAvatar(op.cliente)}
+                        <div class="min-w-0 flex-grow">
+                            <div class="flex items-start justify-between gap-1">
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold tracking-wide uppercase" style="color:${clientColor(op.cliente)[0]}">${esc(op.cliente)}</span>
+                                    ${op.comissao>0?`<span class="ml-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300 rounded text-[10px] font-bold uppercase">com ${op.comissao}%</span>`:''}
+                                    <h5 class="font-bold text-slate-800 dark:text-slate-100 text-sm mt-0.5 leading-snug">${esc(op.projeto)}</h5>
+                                    ${op.motivo?`<p class="text-[11px] text-rose-500 mt-0.5">⚑ ${esc(op.motivo)}</p>`:''}
+                                </div>
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5 ml-1 shrink-0">
+                                    <button onclick="editOpportunity(${op.id})" class="no-drag p-1 text-slate-400 hover:text-indigo-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700" title="Editar">
+                                        <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+                                    </button>
+                                    <button onclick="deleteOpportunity(${op.id})" class="no-drag p-1 text-slate-400 hover:text-rose-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700" title="Excluir">
+                                        <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                        <span class="text-sm font-bold text-slate-800 dark:text-slate-100">${fmt(op.valor)}</span>
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${f.lost ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10' : op.valor >= 1e6 ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' : 'bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}">${probTxt}</span>
+                        <span class="text-sm font-black text-slate-800 dark:text-slate-100">${fmt(op.valor)}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${(PHASE_COLORS[op.statusId]||'#6366F1')}18;color:${PHASE_COLORS[op.statusId]||'#6366F1'}">${probTxt}</span>
                     </div>
                     <button onclick="openTasks(${op.id})" class="no-drag w-full flex items-center gap-1.5 text-[11px] font-semibold px-2 py-1 rounded-md transition-colors ${pillCls}">
                         <svg class="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7l2 2 4-4"/></svg>
@@ -1029,14 +1205,18 @@
         function revealApp(nomeCompleto) {
             const loginScreen = document.getElementById('login-screen');
             const app = document.getElementById('app-container');
-
             loginScreen.style.transition = 'opacity .35s ease';
             loginScreen.style.opacity = '0';
             setTimeout(() => {
                 loginScreen.style.display = 'none';
                 app.classList.remove('hidden');
                 app.classList.add('flex', 'app-reveal');
-                document.getElementById('header-username').textContent = nomeCompleto.split(' ')[0];
+                const first = nomeCompleto.split(' ')[0];
+                const initials = nomeCompleto.trim().split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+                document.getElementById('header-username').textContent = first;
+                ['hdr-avatar-desktop','hdr-avatar-mobile'].forEach(id=>{
+                    const el=document.getElementById(id); if(el) el.textContent=initials;
+                });
             }, 350);
         }
 
@@ -1086,11 +1266,178 @@
                 const app = document.getElementById('app-container');
                 app.classList.remove('hidden');
                 app.classList.add('flex');
-                document.getElementById('header-username').textContent = nome.split(' ')[0];
+                const first = nome.split(' ')[0];
+                const initials = nome.trim().split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+                document.getElementById('header-username').textContent = first;
+                ['hdr-avatar-desktop','hdr-avatar-mobile'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=initials; });
             } else {
                 setTimeout(() => document.getElementById('login-user').focus(), 400);
             }
         })();
+
+        /* ===================== COMPANY AVATAR ===================== */
+        const AVATAR_PALETTES = [
+            ['#0EA5E9','#E0F2FE'],['#8B5CF6','#EDE9FE'],['#10B981','#D1FAE5'],
+            ['#F59E0B','#FEF3C7'],['#EF4444','#FEE2E2'],['#06B6D4','#CFFAFE'],
+            ['#EC4899','#FCE7F3'],['#6366F1','#E0E7FF'],['#F97316','#FFEDD5'],
+        ];
+        function clientColor(name) {
+            let h = 0; for (let i=0;i<name.length;i++) h = (h*31+name.charCodeAt(i))&0xFFFFFF;
+            return AVATAR_PALETTES[Math.abs(h) % AVATAR_PALETTES.length];
+        }
+        function clientAvatar(name) {
+            const [bg, fg] = clientColor(name);
+            const words = name.trim().split(/\s+/);
+            const initials = words.length>1 ? words[0][0]+words[words.length-1][0] : name.slice(0,2);
+            return `<div class="company-avatar" style="background:${fg};color:${bg}">${initials.toUpperCase()}</div>`;
+        }
+
+        /* ===================== DASHBOARD ===================== */
+        const DASH_COLORS = ['#0EA5E9','#8B5CF6','#F59E0B','#EF4444','#10B981','#06B6D4','#EC4899','#6366F1'];
+        const PHASE_COLORS = { 1:'#0EA5E9', 2:'#06B6D4', 3:'#8B5CF6', 4:'#F59E0B', 5:'#10B981', 6:'#EF4444' };
+        let dashCharts = {};
+
+        function openDashboard(type) {
+            const modal = document.getElementById('dash-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            switchDashTab('fases');
+            buildDashboard(type);
+        }
+
+        function closeDashboard() {
+            document.getElementById('dash-modal').classList.add('hidden');
+            document.getElementById('dash-modal').classList.remove('flex');
+            Object.values(dashCharts).forEach(c => { try{c.destroy()}catch(e){} });
+            dashCharts = {};
+        }
+
+        function switchDashTab(tab) {
+            ['fases','clientes','lista'].forEach(t => {
+                document.getElementById(`dtab-${t}`).classList.toggle('hidden', t !== tab);
+            });
+            document.querySelectorAll('.dash-tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.dtab === tab);
+            });
+        }
+
+        function buildDashboard(type) {
+            const active = oportunidades.filter(o => !FASES[o.statusId]?.won && !FASES[o.statusId]?.lost);
+            const won    = oportunidades.filter(o => FASES[o.statusId]?.won);
+            const all    = oportunidades;
+
+            const totalActive = active.reduce((s,o)=>s+o.valor,0);
+            const totalWon    = won.reduce((s,o)=>s+o.valor,0);
+
+            // Update hero
+            const configs = {
+                pipeline: { subtitle:'Pipeline Ativo', value: fmt(totalActive), sub:`${active.length} oportunidades em aberto`, grad:'linear-gradient(135deg,#0EA5E9 0%,#4F46E5 100%)' },
+                forecast: { subtitle:'Forecast Ponderado', value: fmt(active.reduce((s,o)=>s+o.valor*(FASES[o.statusId]?.prob||0),0)), sub:'Valor × probabilidade por fase', grad:'linear-gradient(135deg,#8B5CF6 0%,#EC4899 100%)' },
+                ganho:    { subtitle:'Faturamento Ganho', value: fmt(totalWon), sub:`${won.length} negócio(s) fechado(s)`, grad:'linear-gradient(135deg,#10B981 0%,#0EA5E9 100%)' },
+                clientes: { subtitle:'Oportunidades', value: `${all.length}`, sub:`Ticket médio: ${fmt(Math.round(all.reduce((s,o)=>s+o.valor,0)/Math.max(all.length,1)))}`, grad:'linear-gradient(135deg,#F59E0B 0%,#EF4444 100%)' },
+            };
+            const cfg = configs[type] || configs.pipeline;
+            document.getElementById('dash-subtitle').textContent  = cfg.subtitle;
+            document.getElementById('dash-hero-value').textContent = cfg.value;
+            document.getElementById('dash-hero-sub').textContent   = cfg.sub;
+            document.getElementById('dash-header').style.background = cfg.grad;
+
+            // Phase mini cards
+            const phaseCardCont = document.getElementById('dash-phase-cards');
+            phaseCardCont.innerHTML = '';
+            FASE_IDS.forEach(id => {
+                const fase = FASES[id];
+                const ops = oportunidades.filter(o=>o.statusId===id);
+                const total = ops.reduce((s,o)=>s+o.valor,0);
+                const col = PHASE_COLORS[id] || '#6366F1';
+                phaseCardCont.innerHTML += `
+                <div class="rounded-xl p-3.5 flex flex-col gap-1" style="background:${col}18;border:1.5px solid ${col}35">
+                    <span class="text-[10px] font-bold uppercase tracking-wider" style="color:${col}">${fase.nome}</span>
+                    <span class="text-base font-black text-slate-800 dark:text-white">${fmt(total)}</span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400">${ops.length} oport. • ${Math.round(fase.prob*100)}% prob.</span>
+                </div>`;
+            });
+
+            // Bar chart — value per phase
+            setTimeout(() => {
+                const barCtx = document.getElementById('dash-chart-bar');
+                if (barCtx && !dashCharts.bar) {
+                    const labels = FASE_IDS.map(id => FASES[id].nome);
+                    const data   = FASE_IDS.map(id => oportunidades.filter(o=>o.statusId===id).reduce((s,o)=>s+o.valor,0)/1e6);
+                    const colors = FASE_IDS.map(id => PHASE_COLORS[id]||'#6366F1');
+                    dashCharts.bar = new Chart(barCtx, {
+                        type: 'bar',
+                        data: { labels, datasets:[{ data, backgroundColor:colors, borderRadius:8, borderSkipped:false }] },
+                        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>' US$ '+ctx.parsed.y.toFixed(1)+'M' } } }, scales:{ y:{ ticks:{ callback: v=>v+'M' }, grid:{color:'rgba(0,0,0,.05)'} }, x:{ grid:{display:false} } } }
+                    });
+                }
+
+                // Donut chart — count per phase
+                const donutCtx = document.getElementById('dash-chart-donut');
+                if (donutCtx && !dashCharts.donut) {
+                    const labels = FASE_IDS.map(id => FASES[id].nome);
+                    const data   = FASE_IDS.map(id => oportunidades.filter(o=>o.statusId===id).length);
+                    const colors = FASE_IDS.map(id => PHASE_COLORS[id]||'#6366F1');
+                    dashCharts.donut = new Chart(donutCtx, {
+                        type: 'doughnut',
+                        data: { labels, datasets:[{ data, backgroundColor:colors, borderWidth:2, borderColor:'#ffffff' }] },
+                        options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, boxWidth:10, padding:8 } } } }
+                    });
+                }
+
+                // Client bar chart
+                const clientCtx = document.getElementById('dash-chart-clients');
+                if (clientCtx && !dashCharts.clients) {
+                    const byClient = {};
+                    oportunidades.forEach(o=>{ byClient[o.cliente]=(byClient[o.cliente]||0)+o.valor; });
+                    const sorted = Object.entries(byClient).sort((a,b)=>b[1]-a[1]).slice(0,8);
+                    dashCharts.clients = new Chart(clientCtx, {
+                        type: 'bar',
+                        data: { labels: sorted.map(x=>x[0]), datasets:[{ data: sorted.map(x=>x[1]/1e6), backgroundColor: sorted.map((_,i)=>DASH_COLORS[i%DASH_COLORS.length]), borderRadius:8, borderSkipped:false }] },
+                        options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>' US$ '+ctx.parsed.x.toFixed(1)+'M' } } }, scales:{ x:{ ticks:{ callback:v=>v+'M' }, grid:{color:'rgba(0,0,0,.05)'} }, y:{ grid:{display:false} } } }
+                    });
+                }
+
+                // Client list
+                const clientList = document.getElementById('dash-client-list');
+                const byClient2 = {};
+                oportunidades.forEach(o=>{ if(!byClient2[o.cliente]) byClient2[o.cliente]={total:0,count:0}; byClient2[o.cliente].total+=o.valor; byClient2[o.cliente].count++; });
+                const sortedClients = Object.entries(byClient2).sort((a,b)=>b[1].total-a[1].total);
+                const maxVal = sortedClients[0]?.[1]?.total||1;
+                clientList.innerHTML = sortedClients.map(([name,{total,count}],i)=>{
+                    const [bg] = clientColor(name);
+                    const pct = Math.round(total/maxVal*100);
+                    return `<div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 flex items-center gap-3">
+                        ${clientAvatar(name)}
+                        <div class="flex-grow min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-bold text-slate-800 dark:text-white truncate">${esc(name)}</span>
+                                <span class="text-sm font-black ml-2 shrink-0" style="color:${bg}">${fmt(total)}</span>
+                            </div>
+                            <div class="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700"><div class="h-full rounded-full" style="width:${pct}%;background:${bg}"></div></div>
+                            <span class="text-[10px] text-slate-400 mt-0.5">${count} oportunidade${count>1?'s':''}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                // Full list table
+                const tbody = document.getElementById('dash-table-body');
+                const sorted2 = [...oportunidades].sort((a,b)=>b.valor-a.valor);
+                tbody.innerHTML = sorted2.map(o=>{
+                    const f = FASES[o.statusId]; if(!f) return '';
+                    const col = PHASE_COLORS[o.statusId]||'#6366F1';
+                    return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td class="px-4 py-3"><div class="flex items-center gap-2">${clientAvatar(o.cliente)}<span class="text-sm font-semibold text-slate-800 dark:text-white">${esc(o.cliente)}</span></div></td>
+                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">${esc(o.projeto)}</td>
+                        <td class="px-4 py-3 text-sm font-bold text-slate-800 dark:text-white text-right">${fmt(o.valor)}</td>
+                        <td class="px-4 py-3 text-center"><span class="text-[11px] font-bold px-2.5 py-1 rounded-full" style="background:${col}20;color:${col}">${f.nome}</span></td>
+                    </tr>`;
+                }).join('');
+            }, 80);
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('dash-modal').addEventListener('click', function(e){ if(e.target===this) closeDashboard(); });
 
         /* ===================== INIT ===================== */
         applyTheme(localStorage.getItem('kanban_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
