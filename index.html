@@ -730,6 +730,7 @@
                 </button>
             </div>
             <p id="acc-form-msg" class="hidden text-xs mt-2 font-semibold"></p>
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">🔑 Novos usuários entram com a senha padrão <code class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">GCP@BE2026</code></p>
         </div>
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
             <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-1">Enviar Convite por E-mail</h3>
@@ -1001,6 +1002,11 @@
     ];
 
     let oportunidades = JSON.parse(localStorage.getItem('kanban_oportunidades')) || JSON.parse(JSON.stringify(datasetOriginal));
+    // Safety: if somehow ended up with empty array but dataset has data, restore
+    if (!oportunidades.length && datasetOriginal.length) {
+        oportunidades = JSON.parse(JSON.stringify(datasetOriginal));
+        localStorage.setItem('kanban_oportunidades', JSON.stringify(oportunidades));
+    }
     oportunidades.forEach(o => { if (o.soComissao && o.comissao == null) { o.comissao = 15; } delete o.soComissao; });
     let lastDeleted = null;
 
@@ -1683,6 +1689,15 @@
         'guilherme.queiroz@besolution.com.br':{ senha: 'GCP@BE2026', nome: 'Guilherme Queiroz' },
         'nathalia.rocha@besolution.com.br':  { senha: 'GCP@BE2026', nome: 'Nathalia Rocha' },
     };
+    // Rehydrate passwords for users added via Acessos panel (persisted in crm_passwords)
+    (function rehydratePasswords() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('crm_passwords') || '{}');
+            Object.entries(saved).forEach(([email, data]) => {
+                if (!USERS[email]) USERS[email] = data;
+            });
+        } catch(e) {}
+    })();
     function handleLogin(e) {
         e.preventDefault();
         const user = document.getElementById('login-user').value.trim().toLowerCase();
@@ -1699,8 +1714,10 @@
                 sessionStorage.setItem('crm_nome', USERS[user].nome);
                 revealApp(USERS[user].nome);
             } else {
+                // Check users added via Acessos panel
                 const approved = approvedUsers.find(u => u.email === user);
-                if (approved && approved.method === 'password' && USERS[user]?.senha === pass) {
+                const savedPwd = (() => { try { return JSON.parse(localStorage.getItem('crm_passwords') || '{}'); } catch(e){ return {}; } })();
+                if (approved && savedPwd[user] && savedPwd[user].senha === pass) {
                     sessionStorage.setItem('crm_user', user);
                     sessionStorage.setItem('crm_nome', approved.nome);
                     revealApp(approved.nome);
@@ -2043,18 +2060,32 @@
         if (!nome || !email) { showAccMsg('Preencha nome e e-mail.', 'error'); return; }
         if (!email.endsWith('@besolution.com.br')) { showAccMsg('Apenas emails @besolution.com.br são permitidos.', 'error'); return; }
         if (approvedUsers.find(u => u.email === email)) { showAccMsg('Este e-mail já tem acesso.', 'error'); return; }
+        const senha = 'GCP@BE2026';
         approvedUsers.push({ email, nome, role, method: 'password', addedAt: new Date().toISOString() });
-        USERS[email] = { senha: 'GCP@BE2026', nome };
+        USERS[email] = { senha, nome };
+        // Persist password separately so it survives page reload
+        try {
+            const saved = JSON.parse(localStorage.getItem('crm_passwords') || '{}');
+            saved[email] = { senha, nome };
+            localStorage.setItem('crm_passwords', JSON.stringify(saved));
+        } catch(e) {}
         persistAccess();
         document.getElementById('acc-nome-input').value = ''; document.getElementById('acc-email-input').value = '';
-        showAccMsg(`✅ ${nome} adicionado(a) com acesso.`, 'success');
+        showAccMsg(`✅ ${nome} adicionado(a). Senha padrão: GCP@BE2026`, 'success');
         renderAcessos();
     }
     function revokeUser(email) {
         const user = approvedUsers.find(u => u.email === email);
         if (!confirm(`Revogar acesso de ${user?.nome || email}?`)) return;
         approvedUsers = approvedUsers.filter(u => u.email !== email);
-        delete USERS[email]; persistAccess(); renderAcessos();
+        delete USERS[email];
+        // Remove from persisted passwords too
+        try {
+            const saved = JSON.parse(localStorage.getItem('crm_passwords') || '{}');
+            delete saved[email];
+            localStorage.setItem('crm_passwords', JSON.stringify(saved));
+        } catch(e) {}
+        persistAccess(); renderAcessos();
         showToast(`Acesso de ${user?.nome || email} revogado.`);
     }
     function showAccMsg(text, type) {
