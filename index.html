@@ -99,17 +99,17 @@
 
         /* ===== PRESENCE VIEWER ===== */
         @keyframes presencePop { from{opacity:0;transform:scale(.85) translateY(8px)} to{opacity:1;transform:none} }
-        #presence-bar { animation: presencePop .25s cubic-bezier(.22,1,.36,1); }
+        #presence-bar { animation: presencePop .25s cubic-bezier(.22,1,.36,1); display: flex; align-items: center; }
+        #presence-avatars { overflow: visible; display: flex; align-items: center; line-height: 0; }
         .presence-avatar {
             width: 28px; height: 28px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 10px; font-weight: 800; color: white;
             border: 2px solid white; cursor: default;
-            transition: transform .15s, z-index .15s;
-            position: relative;
+            transition: transform .15s; position: relative; overflow: visible;
         }
         .dark .presence-avatar { border-color: #1e293b; }
-        .presence-avatar:hover { transform: scale(1.2); z-index: 10; }
+        .presence-avatar:hover { transform: scale(1.2); z-index: 50 !important; }
         .presence-avatar .presence-dot {
             position: absolute; bottom: -1px; right: -1px;
             width: 8px; height: 8px; border-radius: 50%;
@@ -119,15 +119,15 @@
         @keyframes presencePulse { 0%,100%{opacity:1} 50%{opacity:.5} }
         .presence-dot { animation: presencePulse 2.5s ease-in-out infinite; }
         .presence-tooltip {
-            position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
             background: #1e293b; color: white; font-size: 10px; font-weight: 600;
             padding: 4px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none;
-            opacity: 0; transition: opacity .15s; z-index: 100;
+            opacity: 0; transition: opacity .15s; z-index: 200;
         }
         .presence-avatar:hover .presence-tooltip { opacity: 1; }
-        .presence-tooltip::after {
-            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            border: 4px solid transparent; border-top-color: #1e293b;
+        .presence-tooltip::before {
+            content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            border: 4px solid transparent; border-bottom-color: #1e293b;
         }
         #presence-panel {
             position: absolute; top: calc(100% + 8px); right: 0;
@@ -1124,8 +1124,9 @@
             avatarsEl.innerHTML = presenceUsers.slice(0, 4).map((u, i) => {
                 const [bg] = clientColor(u.nome);
                 const init = u.nome.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
-                const selfBadge = u.self ? ' ring-2 ring-indigo-400 ring-offset-1' : '';
-                return `<div class="presence-avatar${selfBadge}" style="background:${bg};margin-left:${i>0?'-6px':'0'};z-index:${10-i}"
+                const selfStyle = u.self ? 'box-shadow:0 0 0 2px #818cf8,0 0 0 4px white;' : '';
+                const darkSelfStyle = ''; // handled inline
+                return `<div class="presence-avatar" style="background:${bg};margin-left:${i>0?'-6px':'0'};z-index:${10-i};${selfStyle}"
                     title="${esc(u.nome)}${u.self?' (você)':''}">
                     ${init}
                     <span class="presence-dot"></span>
@@ -1790,10 +1791,17 @@
         errEl.classList.add('hidden'); sucEl.classList.add('hidden');
         if (!nome) { errEl.textContent = 'Informe seu nome completo.'; errEl.classList.remove('hidden'); return; }
         if (!email.endsWith('@besolution.com.br')) { errEl.textContent = 'Use seu e-mail @besolution.com.br.'; errEl.classList.remove('hidden'); return; }
-        if (approvedUsers.find(u => u.email === email)) { errEl.textContent = 'Este e-mail já tem acesso.'; errEl.classList.remove('hidden'); return; }
-        if (pendingRequests.find(r => r.email === email)) { sucEl.textContent = '⏳ Sua solicitação já foi enviada. Aguarde a aprovação.'; sucEl.classList.remove('hidden'); return; }
-        pendingRequests.push({ email, nome, requestedAt: new Date().toISOString() });
-        persistPending(); updateAccessBadge();
+        // Read directly from localStorage to work even before main app vars are initialized
+        const approved = JSON.parse(localStorage.getItem('crm_access') || '[]');
+        const pending  = JSON.parse(localStorage.getItem('crm_pending') || '[]');
+        if (approved.find(u => u.email === email)) { errEl.textContent = 'Este e-mail já tem acesso.'; errEl.classList.remove('hidden'); return; }
+        if (pending.find(r => r.email === email)) { sucEl.textContent = '⏳ Sua solicitação já foi enviada. Aguarde a aprovação.'; sucEl.classList.remove('hidden'); return; }
+        pending.push({ email, nome, requestedAt: new Date().toISOString() });
+        localStorage.setItem('crm_pending', JSON.stringify(pending));
+        // Sync in-memory variable and re-render if app is already initialized
+        try { pendingRequests = pending; updateAccessBadge(); renderAcessos(); } catch(e) {}
+        // Also update badge directly as fallback
+        try { const b = document.getElementById('access-badge'); if (b) { b.textContent = pending.length; b.classList.toggle('hidden', pending.length === 0); } } catch(e) {}
         sucEl.textContent = `✅ Solicitação enviada, ${nome.split(' ')[0]}! Um administrador irá aprovar em breve.`;
         sucEl.classList.remove('hidden');
         btn.disabled = true; btn.classList.add('opacity-50');
