@@ -997,10 +997,10 @@
         function gradeInfo(type, gid) { return (GRADES[type]?.etapas || []).find(e => e.id === gid) || null; }
         function lastGrade(type) { const es = GRADES[type]?.etapas || []; return es.length ? es[es.length - 1].id : 1; }
 
-        /* ===================== DATASET (61 negócios reconciliados) ===================== */
+        /* ===================== DATASET (64 negócios · sincronizado FUP 07/08/2026) ===================== */
         const datasetOriginal = [
             { id:1, cliente:"Prodemg", projeto:"Portal Detran", valor:8940000, statusId:1, emissao:"MKTP", grade:1, comissao:20 },
-            { id:2, cliente:"Prodemg", projeto:"Resell Google Cloud", valor:120000000, statusId:1, emissao:"MKTP", grade:1 },
+            { id:2, cliente:"Prodemg", projeto:"Resell Google Cloud", valor:50000000, statusId:1, emissao:"MKTP", grade:1 },
             { id:3, cliente:"Detran", projeto:"Talonário Eletrônico - SIM", valor:10200000, statusId:1, emissao:"INVOICE_BR", grade:1, comissao:15 },
             { id:4, cliente:"El Salvador", projeto:"Liveness em El Salvador", valor:10000000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:5, cliente:"SP Trans", projeto:"Data Lake", valor:9900000, statusId:1, emissao:"MKTP", grade:1, comissao:15 },
@@ -1009,13 +1009,13 @@
             { id:8, cliente:"FTD", projeto:"Nova Iônica", valor:1290000, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:9, cliente:"Órbita", projeto:"SIGA", valor:950000, statusId:3, emissao:"EMISSAO_REGULAR", grade:5 },
             { id:10, cliente:"Rede D'Or", projeto:"RFI", valor:940000, statusId:3, emissao:"INVOICE_BR", grade:7 },
-            { id:11, cliente:"Ministério dos Esportes", projeto:"Autoridade Brasileira de Controle de Dopagem (ABCD)", valor:831186.98, statusId:3, emissao:"INVOICE_BR", grade:7 },
+            { id:11, cliente:"Ministério dos Esportes", projeto:"Autoridade Brasileira de Controle de Dopagem (ABCD)", valor:2240000, statusId:3, emissao:"INVOICE_BR", grade:7 },
             { id:12, cliente:"CNI", projeto:"Agentes", valor:800000, statusId:1, emissao:"CNI", grade:1 },
             { id:13, cliente:"Detran DF", projeto:"TBD", valor:500000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:14, cliente:"Sebrae SP", projeto:"Alvo Certo", valor:360000, statusId:1, emissao:"MKTP", grade:1 },
             { id:15, cliente:"SDUH", projeto:"Migração", valor:330000, statusId:1, emissao:"MKTP", grade:1 },
-            { id:16, cliente:"Detran", projeto:"Alloy DB", valor:230000, statusId:2, emissao:"INVOICE_BR", grade:1 },
-            { id:17, cliente:"Detran", projeto:"Mandiant / Security", valor:220000, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:16, cliente:"Detran", projeto:"Alloy DB", valor:230539.34, statusId:2, emissao:"INVOICE_BR", grade:1 },
+            { id:17, cliente:"Detran", projeto:"Mandiant / Security", valor:23000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:18, cliente:"Detran", projeto:"Gestão Regulatória Up Stream", valor:217514, statusId:3, emissao:"INVOICE_BR", grade:7 },
             { id:19, cliente:"Ingram MT", projeto:"Squad de Serviços em Geral", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:20, cliente:"Detran", projeto:"RST Up Stream", valor:195000, statusId:1, emissao:"INVOICE_BR", grade:1 },
@@ -1035,21 +1035,21 @@
             { id:35, cliente:"Sebrae MT", projeto:"Frente de Marketing", valor:50000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:36, cliente:"FTD", projeto:"Correção de Redação", valor:47000, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:37, cliente:"FTD", projeto:"Profy - Iônica", valor:47000, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
-            { id:38, cliente:"Governo Colômbia", projeto:"Saúde das Forças Armadas (SSMP)", valor:40000, statusId:4, emissao:"INVOICE_BR", grade:1 },
+            { id:38, cliente:"Governo Colômbia", projeto:"Saúde das Forças Armadas (SSMP)", valor:40000, statusId:7, emissao:"INVOICE_BR", grade:1 },
             { id:39, cliente:"AFYA", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:40, cliente:"Arco", projeto:"Leia", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:41, cliente:"Autopass", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:42, cliente:"Detran", projeto:"Prova Prática (Nova Fase)", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:43, cliente:"El Salvador", projeto:"Drones", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:44, cliente:"FTD", projeto:"Tutor Socrático ESX", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:43, cliente:"El Salvador", projeto:"Drones", valor:250000, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:44, cliente:"FTD", projeto:"Tutor Socrático ESX", valor:105660.38, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:45, cliente:"FTD", projeto:"FTD Com Você", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:46, cliente:"Gov da Paraíba", projeto:"SIGA", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:47, cliente:"Gov MT", projeto:"Apresentação NINA e aceleradores", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:48, cliente:"Sebrae Nacional", projeto:"PNBOX +", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:48, cliente:"Sebrae Nacional", projeto:"PNBOX +", valor:139680, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:49, cliente:"Secretária da Agricultura SP", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:50, cliente:"SEED PR", projeto:"ESX", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:50, cliente:"SEED PR", projeto:"ESX", valor:117670, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:51, cliente:"SERPRO", projeto:"Projetos Multicloud", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:30, cliente:"Arco", projeto:"Migração", valor:60000, statusId:4, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:30, cliente:"Arco", projeto:"Migração", valor:60000, statusId:7, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:52, cliente:"Sistema S", projeto:"Licitação Google Cloud", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:53, cliente:"Ingram GO", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:54, cliente:"Cioeste", projeto:"Consórcio", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
@@ -1059,10 +1059,26 @@
             { id:58, cliente:"Vértice", projeto:"Boleto de cobrança de Água em Louveira", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:59, cliente:"Gov da Paraíba", projeto:"crIAr", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:60, cliente:"Vértice", projeto:"Picpay", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:61, cliente:"Policia Cívil", projeto:"TBD", valor:600000, statusId:1, emissao:"INVOICE_BR", grade:1 }
+            { id:61, cliente:"Policia Cívil", projeto:"TBD", valor:600000, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:62, cliente:"DETRAN-MG", projeto:"Modernização Digital (4 SOWs)", valor:9750000, statusId:3, emissao:"MKTP", grade:1 },
+            { id:63, cliente:"FTD", projeto:"Editorial", valor:75075, statusId:3, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:64, cliente:"Arco", projeto:"Analise de vídeo", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 }
         ];
 
-        let oportunidades = JSON.parse(localStorage.getItem('kanban_oportunidades')) || JSON.parse(JSON.stringify(datasetOriginal));
+        // Seed versionado: quando a versão embutida muda (dataset ressincronizado da planilha),
+        // reaplica o datasetOriginal uma vez, sobrescrevendo o cache antigo do navegador.
+        const DATASET_VERSION = '2026-08-07';
+        let oportunidades;
+        {
+            const cacheVer = localStorage.getItem('kanban_dataset_versao');
+            const cached = JSON.parse(localStorage.getItem('kanban_oportunidades') || 'null');
+            if (cached && cacheVer === DATASET_VERSION) {
+                oportunidades = cached;
+            } else {
+                oportunidades = JSON.parse(JSON.stringify(datasetOriginal));
+                localStorage.setItem('kanban_dataset_versao', DATASET_VERSION);
+            }
+        }
         oportunidades.forEach(o => {
             if (o.soComissao && o.comissao == null) o.comissao = 15;
             delete o.soComissao;
@@ -1529,7 +1545,7 @@
             });
         }
         function undoDelete() { if (!lastDeleted) return; oportunidades.splice(Math.min(lastDeleted.idx, oportunidades.length), 0, lastDeleted.item); lastDeleted = null; renderKanban(); }
-        function resetData() { askConfirm('Resetar oportunidades', 'Isso restaura todas as colunas para os 61 negócios originais. Continuar?', () => { oportunidades = JSON.parse(JSON.stringify(datasetOriginal)); renderKanban(); if (currentTab === 'emissao') renderEmissao(currentEmissao); toast('Dados restaurados.'); }); }
+        function resetData() { askConfirm('Resetar oportunidades', 'Isso restaura todas as colunas para os ' + datasetOriginal.length + ' negócios originais. Continuar?', () => { oportunidades = JSON.parse(JSON.stringify(datasetOriginal)); localStorage.setItem('kanban_dataset_versao', DATASET_VERSION); persist(); renderKanban(); if (currentTab === 'emissao') renderEmissao(currentEmissao); toast('Dados restaurados.'); }); }
 
         /* ===================== CONFIRM + TOAST ===================== */
         let confirmCb = null;
