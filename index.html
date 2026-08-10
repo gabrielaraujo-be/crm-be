@@ -923,13 +923,13 @@
     <script>
         /* ===================== FASES (pipeline comercial) ===================== */
         const FASES = {
-            1: { nome: 'Prospecção',   dot: 'bg-blue-500',    badge: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300',       val: 'text-blue-600 dark:text-blue-400',    prob: 0.10 },
-            2: { nome: 'Qualificação', dot: 'bg-violet-500',  badge: 'bg-violet-100 text-violet-800 dark:bg-violet-500/15 dark:text-violet-300', val: 'text-violet-600 dark:text-violet-400', prob: 0.25 },
-            3: { nome: 'Proposta',     dot: 'bg-amber-500',   badge: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300',    val: 'text-amber-600 dark:text-amber-400',  prob: 0.50 },
-            4: { nome: 'Negociação',   dot: 'bg-pink-500',    badge: 'bg-pink-100 text-pink-800 dark:bg-pink-500/15 dark:text-pink-300',         val: 'text-pink-600 dark:text-pink-400',    prob: 0.80 },
-            5: { nome: 'Faturados 💰', dot: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300', val: 'text-emerald-600 dark:text-emerald-400', prob: 1.00, won: true },
-            6: { nome: 'Recebidos 🎉', dot: 'bg-purple-500',  badge: 'bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300', val: 'text-purple-600 dark:text-purple-400', prob: 1.00, won: true },
-            7: { nome: 'Perdido',      dot: 'bg-rose-500',    badge: 'bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300',         val: 'text-rose-600 dark:text-rose-400',    prob: 0.00, lost: true }
+            1: { nome: 'Prospecção',           dot: 'bg-blue-500',    badge: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300',       val: 'text-blue-600 dark:text-blue-400',    prob: 0.10 },
+            2: { nome: 'Qualificação',         dot: 'bg-violet-500',  badge: 'bg-violet-100 text-violet-800 dark:bg-violet-500/15 dark:text-violet-300', val: 'text-violet-600 dark:text-violet-400', prob: 0.25 },
+            3: { nome: 'Apresentação',         dot: 'bg-cyan-500',    badge: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-300',       val: 'text-cyan-600 dark:text-cyan-400',    prob: 0.40 },
+            4: { nome: 'Proposta',             dot: 'bg-amber-500',   badge: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300',    val: 'text-amber-600 dark:text-amber-400',  prob: 0.50 },
+            5: { nome: 'Negociação',           dot: 'bg-pink-500',    badge: 'bg-pink-100 text-pink-800 dark:bg-pink-500/15 dark:text-pink-300',         val: 'text-pink-600 dark:text-pink-400',    prob: 0.80 },
+            6: { nome: 'Deal Fechado 💰',      dot: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300', val: 'text-emerald-600 dark:text-emerald-400', prob: 1.00, won: true },
+            7: { nome: 'Perdidos/Cancelados',  dot: 'bg-rose-500',    badge: 'bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300',         val: 'text-rose-600 dark:text-rose-400',    prob: 0.00, lost: true }
         };
         const FASE_IDS = Object.keys(FASES).map(Number);
 
@@ -997,87 +997,82 @@
         function gradeInfo(type, gid) { return (GRADES[type]?.etapas || []).find(e => e.id === gid) || null; }
         function lastGrade(type) { const es = GRADES[type]?.etapas || []; return es.length ? es[es.length - 1].id : 1; }
 
-        /* ===================== DATASET (64 negócios · sincronizado FUP 07/08/2026) ===================== */
+        /* ===================== DATASET (64 negócios · fases sincronizadas com FUP 07/08/2026) ===================== */
         const datasetOriginal = [
-            { id:1, cliente:"Prodemg", projeto:"Portal Detran", valor:8940000, statusId:1, emissao:"MKTP", grade:1, comissao:20 },
+            { id:1, cliente:"Prodemg", projeto:"Portal Detran", valor:8940000, statusId:3, emissao:"MKTP", grade:1, comissao:20 },
             { id:2, cliente:"Prodemg", projeto:"Resell Google Cloud", valor:50000000, statusId:1, emissao:"MKTP", grade:1 },
             { id:3, cliente:"Detran", projeto:"Talonário Eletrônico - SIM", valor:10200000, statusId:1, emissao:"INVOICE_BR", grade:1, comissao:15 },
             { id:4, cliente:"El Salvador", projeto:"Liveness em El Salvador", valor:10000000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:5, cliente:"SP Trans", projeto:"Data Lake", valor:9900000, statusId:1, emissao:"MKTP", grade:1, comissao:15 },
-            { id:6, cliente:"Data Prev", projeto:"Banco de Horas - SGD/MGI", valor:4500000, statusId:1, emissao:"MKTP", grade:1 },
-            { id:7, cliente:"Data Prev", projeto:"LMS", valor:2000000, statusId:1, emissao:"MKTP", grade:1 },
+            { id:6, cliente:"Data Prev", projeto:"Banco de Horas - SGD/MGI", valor:4500000, statusId:5, emissao:"MKTP", grade:1 },
+            { id:7, cliente:"Data Prev", projeto:"LMS", valor:2000000, statusId:5, emissao:"MKTP", grade:1 },
             { id:8, cliente:"FTD", projeto:"Nova Iônica", valor:1290000, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
-            { id:9, cliente:"Órbita", projeto:"SIGA", valor:950000, statusId:3, emissao:"EMISSAO_REGULAR", grade:5 },
+            { id:9, cliente:"Órbita", projeto:"SIGA", valor:950000, statusId:1, emissao:"EMISSAO_REGULAR", grade:5 },
             { id:10, cliente:"Rede D'Or", projeto:"RFI", valor:940000, statusId:3, emissao:"INVOICE_BR", grade:7 },
-            { id:11, cliente:"Ministério dos Esportes", projeto:"Autoridade Brasileira de Controle de Dopagem (ABCD)", valor:2240000, statusId:3, emissao:"INVOICE_BR", grade:7 },
-            { id:12, cliente:"CNI", projeto:"Agentes", valor:800000, statusId:1, emissao:"CNI", grade:1 },
+            { id:11, cliente:"Ministério dos Esportes", projeto:"Autoridade Brasileira de Controle de Dopagem (ABCD)", valor:2240000, statusId:4, emissao:"INVOICE_BR", grade:7 },
+            { id:12, cliente:"CNI", projeto:"Agentes", valor:800000, statusId:2, emissao:"CNI", grade:1 },
             { id:13, cliente:"Detran DF", projeto:"TBD", valor:500000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:14, cliente:"Sebrae SP", projeto:"Alvo Certo", valor:360000, statusId:1, emissao:"MKTP", grade:1 },
             { id:15, cliente:"SDUH", projeto:"Migração", valor:330000, statusId:1, emissao:"MKTP", grade:1 },
-            { id:16, cliente:"Detran", projeto:"Alloy DB", valor:230539.34, statusId:2, emissao:"INVOICE_BR", grade:1 },
-            { id:17, cliente:"Detran", projeto:"Mandiant / Security", valor:23000, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:18, cliente:"Detran", projeto:"Gestão Regulatória Up Stream", valor:217514, statusId:3, emissao:"INVOICE_BR", grade:7 },
+            { id:16, cliente:"Detran", projeto:"Alloy DB", valor:230539.34, statusId:5, emissao:"INVOICE_BR", grade:1 },
+            { id:17, cliente:"Detran", projeto:"Mandiant / Security", valor:23000, statusId:4, emissao:"INVOICE_BR", grade:1 },
+            { id:18, cliente:"Detran", projeto:"Gestão Regulatória Up Stream", valor:217514, statusId:6, emissao:"INVOICE_BR", grade:7 },
             { id:19, cliente:"Ingram MT", projeto:"Squad de Serviços em Geral", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:20, cliente:"Detran", projeto:"RST Up Stream", valor:195000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:21, cliente:"Detran", projeto:"Prova Prática Up Stream", valor:189000, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:22, cliente:"PUC-PR", projeto:"Programas de IA (Brand Guardian e Creator Studio)", valor:181216, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
-            { id:23, cliente:"Órbita", projeto:"PNLD (Marketing)", valor:134888, statusId:3, emissao:"EMISSAO_REGULAR", grade:5 },
-            { id:24, cliente:"Data Prev", projeto:"Banco de Horas - CNDB", valor:0, statusId:1, emissao:"MKTP", grade:1 },
+            { id:22, cliente:"PUC-PR", projeto:"Programas de IA (Brand Guardian e Creator Studio)", valor:181216, statusId:4, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:23, cliente:"Órbita", projeto:"PNLD (Marketing)", valor:134888, statusId:1, emissao:"EMISSAO_REGULAR", grade:5 },
+            { id:24, cliente:"Data Prev", projeto:"Banco de Horas - CNDB", valor:0, statusId:4, emissao:"MKTP", grade:1 },
             { id:25, cliente:"CNI", projeto:"RDS", valor:142000, statusId:1, emissao:"CNI", grade:1 },
-            { id:26, cliente:"Sesi", projeto:"RDS - Sustentação", valor:142000, statusId:3, emissao:"INVOICE_BR", grade:7 },
-            { id:27, cliente:"FTD", projeto:"Projeção Fiscal", valor:95000, statusId:3, emissao:"EMISSAO_REGULAR", grade:5 },
+            { id:26, cliente:"Sesi", projeto:"RDS - Sustentação", valor:142000, statusId:4, emissao:"INVOICE_BR", grade:7 },
+            { id:27, cliente:"FTD", projeto:"Projeção Fiscal", valor:95000, statusId:4, emissao:"EMISSAO_REGULAR", grade:5 },
             { id:28, cliente:"Sebrae MT", projeto:"Frente de Excelência", valor:80000, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:29, cliente:"AGU", projeto:"Advocacia Geral da União", valor:60000, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:31, cliente:"Celepar", projeto:"Delegacia Eletrônica PR", valor:60000, statusId:3, emissao:"INVOICE_BR", grade:7 },
+            { id:29, cliente:"AGU", projeto:"Advocacia Geral da União", valor:60000, statusId:4, emissao:"INVOICE_BR", grade:1 },
+            { id:31, cliente:"Celepar", projeto:"Delegacia Eletrônica PR", valor:60000, statusId:5, emissao:"INVOICE_BR", grade:7 },
             { id:32, cliente:"CNI", projeto:"CCE", valor:60000, statusId:1, emissao:"CNI", grade:1 },
             { id:33, cliente:"CNI", projeto:"Astra", valor:50000, statusId:1, emissao:"CNI", grade:1 },
-            { id:34, cliente:"Governo Colômbia", projeto:"IA contra Corrupção (Helios)", valor:50000, statusId:3, emissao:"INVOICE_BR", grade:7 },
+            { id:34, cliente:"Governo Colômbia", projeto:"IA contra Corrupção (Helios)", valor:50000, statusId:6, emissao:"INVOICE_BR", grade:7 },
             { id:35, cliente:"Sebrae MT", projeto:"Frente de Marketing", valor:50000, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:36, cliente:"FTD", projeto:"Correção de Redação", valor:47000, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
-            { id:37, cliente:"FTD", projeto:"Profy - Iônica", valor:47000, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:36, cliente:"FTD", projeto:"Correção de Redação", valor:47000, statusId:2, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:37, cliente:"FTD", projeto:"Profy - Iônica", valor:47000, statusId:6, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:38, cliente:"Governo Colômbia", projeto:"Saúde das Forças Armadas (SSMP)", valor:40000, statusId:7, emissao:"INVOICE_BR", grade:1 },
             { id:39, cliente:"AFYA", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:40, cliente:"Arco", projeto:"Leia", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:40, cliente:"Arco", projeto:"Leia", valor:0, statusId:3, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:41, cliente:"Autopass", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:42, cliente:"Detran", projeto:"Prova Prática (Nova Fase)", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:43, cliente:"El Salvador", projeto:"Drones", valor:250000, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:44, cliente:"FTD", projeto:"Tutor Socrático ESX", valor:105660.38, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:43, cliente:"El Salvador", projeto:"Drones", valor:250000, statusId:4, emissao:"INVOICE_BR", grade:1 },
+            { id:44, cliente:"FTD", projeto:"Tutor Socrático ESX", valor:105660.38, statusId:4, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:45, cliente:"FTD", projeto:"FTD Com Você", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:46, cliente:"Gov da Paraíba", projeto:"SIGA", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:47, cliente:"Gov MT", projeto:"Apresentação NINA e aceleradores", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:48, cliente:"Sebrae Nacional", projeto:"PNBOX +", valor:139680, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:49, cliente:"Secretária da Agricultura SP", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:49, cliente:"Secretária da Agricultura SP", projeto:"TBD", valor:0, statusId:4, emissao:"INVOICE_BR", grade:1 },
             { id:50, cliente:"SEED PR", projeto:"ESX", valor:117670, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:51, cliente:"SERPRO", projeto:"Projetos Multicloud", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:30, cliente:"Arco", projeto:"Migração", valor:60000, statusId:7, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:52, cliente:"Sistema S", projeto:"Licitação Google Cloud", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:53, cliente:"Ingram GO", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:54, cliente:"Cioeste", projeto:"Consórcio", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:54, cliente:"Cioeste", projeto:"Consórcio", valor:0, statusId:2, emissao:"INVOICE_BR", grade:1 },
             { id:55, cliente:"Detran CE", projeto:"TBD", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
-            { id:56, cliente:"Vértice", projeto:"Boleto de cobrança de Água em Paranaparema", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
+            { id:56, cliente:"Vértice", projeto:"Boleto de cobrança de Água em Paranaparema", valor:0, statusId:2, emissao:"INVOICE_BR", grade:1 },
             { id:57, cliente:"Vértice", projeto:"Senatran", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:58, cliente:"Vértice", projeto:"Boleto de cobrança de Água em Louveira", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:59, cliente:"Gov da Paraíba", projeto:"crIAr", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:60, cliente:"Vértice", projeto:"Picpay", valor:0, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:61, cliente:"Policia Cívil", projeto:"TBD", valor:600000, statusId:1, emissao:"INVOICE_BR", grade:1 },
             { id:62, cliente:"DETRAN-MG", projeto:"Modernização Digital (4 SOWs)", valor:9750000, statusId:3, emissao:"MKTP", grade:1 },
-            { id:63, cliente:"FTD", projeto:"Editorial", valor:75075, statusId:3, emissao:"EMISSAO_REGULAR", grade:1 },
+            { id:63, cliente:"FTD", projeto:"Editorial", valor:75075, statusId:4, emissao:"EMISSAO_REGULAR", grade:1 },
             { id:64, cliente:"Arco", projeto:"Analise de vídeo", valor:0, statusId:1, emissao:"EMISSAO_REGULAR", grade:1 }
         ];
 
-        // Seed versionado: quando a versão embutida muda (dataset ressincronizado da planilha),
-        // reaplica o datasetOriginal uma vez, sobrescrevendo o cache antigo do navegador.
-        const DATASET_VERSION = '2026-08-07';
+        // Seed versionado: ao mudar a estrutura de fases / dados, reaplica o seed uma vez sobre o cache antigo.
+        const DATASET_VERSION = '2026-08-10-fases';
         let oportunidades;
         {
-            const cacheVer = localStorage.getItem('kanban_dataset_versao');
-            const cached = JSON.parse(localStorage.getItem('kanban_oportunidades') || 'null');
-            if (cached && cacheVer === DATASET_VERSION) {
-                oportunidades = cached;
-            } else {
-                oportunidades = JSON.parse(JSON.stringify(datasetOriginal));
-                localStorage.setItem('kanban_dataset_versao', DATASET_VERSION);
-            }
+            const _cv = localStorage.getItem('kanban_dataset_versao');
+            const _cached = JSON.parse(localStorage.getItem('kanban_oportunidades') || 'null');
+            if (_cached && _cv === DATASET_VERSION) { oportunidades = _cached; }
+            else { oportunidades = JSON.parse(JSON.stringify(datasetOriginal)); localStorage.setItem('kanban_dataset_versao', DATASET_VERSION); }
         }
         oportunidades.forEach(o => {
             if (o.soComissao && o.comissao == null) o.comissao = 15;
@@ -1192,7 +1187,7 @@
             const board = document.getElementById('board'); board.innerHTML = '';
             FASE_IDS.forEach(id => {
                 const f = FASES[id];
-                const wrapBg = f.won ? (id === 5 ? 'bg-emerald-50 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-500/20' : 'bg-purple-50/50 dark:bg-purple-500/5 border-purple-200 dark:border-purple-500/20')
+                const wrapBg = f.won ? 'bg-emerald-50 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-500/20'
                     : f.lost ? 'bg-rose-50 dark:bg-rose-500/5 border-rose-200 dark:border-rose-500/20'
                     : 'bg-slate-100 dark:bg-slate-900 border-slate-200/60 dark:border-slate-800';
                 const col = document.createElement('div');
@@ -1545,7 +1540,7 @@
             });
         }
         function undoDelete() { if (!lastDeleted) return; oportunidades.splice(Math.min(lastDeleted.idx, oportunidades.length), 0, lastDeleted.item); lastDeleted = null; renderKanban(); }
-        function resetData() { askConfirm('Resetar oportunidades', 'Isso restaura todas as colunas para os ' + datasetOriginal.length + ' negócios originais. Continuar?', () => { oportunidades = JSON.parse(JSON.stringify(datasetOriginal)); localStorage.setItem('kanban_dataset_versao', DATASET_VERSION); persist(); renderKanban(); if (currentTab === 'emissao') renderEmissao(currentEmissao); toast('Dados restaurados.'); }); }
+        function resetData() { askConfirm('Resetar oportunidades', 'Isso restaura todas as colunas para os ' + datasetOriginal.length + ' negócios originais. Continuar?', () => { oportunidades = JSON.parse(JSON.stringify(datasetOriginal)); localStorage.setItem('kanban_dataset_versao', DATASET_VERSION); localStorage.setItem('kanban_oportunidades', JSON.stringify(oportunidades)); renderKanban(); if (currentTab === 'emissao') renderEmissao(currentEmissao); toast('Dados restaurados.'); }); }
 
         /* ===================== CONFIRM + TOAST ===================== */
         let confirmCb = null;
@@ -1573,7 +1568,7 @@
         const CLIENT_LOGOS = {};
         function clientLogo(name) { const url = CLIENT_LOGOS[name]; if (!url) return ''; return `<div class="shrink-0 w-9 h-9 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 p-1 flex items-center justify-center overflow-hidden shadow-sm"><img src="${url}" alt="${name}" class="w-full h-full object-contain" onerror="this.parentElement.style.display='none'"></div>`; }
         const DASH_COLORS = ['#0EA5E9','#8B5CF6','#F59E0B','#EF4444','#10B981','#06B6D4','#EC4899','#6366F1'];
-        const PHASE_COLORS = { 1: '#3B82F6', 2: '#8B5CF6', 3: '#F59E0B', 4: '#EC4899', 5: '#10B981', 6: '#A855F7', 7: '#EF4444' };
+        const PHASE_COLORS = { 1: '#3B82F6', 2: '#8B5CF6', 3: '#06B6D4', 4: '#F59E0B', 5: '#EC4899', 6: '#10B981', 7: '#EF4444' };
 
         /* ===================== AUTH ===================== */
         const USERS = {
